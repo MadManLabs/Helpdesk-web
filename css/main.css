@@ -1,0 +1,56 @@
+
+img.logo
+{
+	width: 38px;
+	margin-top: 5px;
+	margin-left: 5px;
+	margin-bottom: 5px;
+}
+
+img.logo-medium
+{
+	width: 20%;
+	min-width: 100px;
+	max-width: 150px;
+}
+
+a.logo
+{
+	text-decoration: none;
+	color: black;
+}
+
+span.logo
+{
+	vertical-align:sub;
+	font-size: 20px;
+	font-weight: 200;
+}
+
+h1.logo
+{
+	font-weight: 200;
+}
+
+.form-inline div div div
+{
+	padding: 2px;
+}
+.progress
+{
+	height: 10px;
+}
+
+.disabled.link
+{
+	
+}
+
+.description
+{
+	border-left: 1px #c9c9c9 solid;
+	margin-left: 10px;
+	padding-left: 10px;
+	align-content: center;
+}
+
