@@ -1,0 +1,42 @@
+<!-- Student view-->
+<div class="row">
+		<div class="col-xs-12 ">
+			<h1 class="text-center jumbotron">Welcome to {{helpdesk}}!<br><small class="text-center">Enter your details down below</small></h1>
+		</div>
+		<div class="col-xs-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">Your Information</div>
+				<div class="panel-body">
+					<form class="form" name="studentEntry">
+						<div class="form-group">
+							<label for="sname">Name:</label>
+							<input id="sname" class="form-control" name="sname" type="text" data-ng-model="inputStudent.name" required="required">
+						</div>
+						<div class="form-group">
+							<label for="sunit">Unit:</label>
+							<select id="sunit" class="form-control" data-ng-model="inputStudent.subject">
+								<option data-ng-repeat="unit in units" value="{{unit.name}}">{{unit.name}}</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="sdescription">Need help on?</label>
+							<textarea id="sdescription" class="form-control" name="sdescription" type="text" data-ng-model="inputDescription">(eg: task no.)</textarea>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" data-ng-model="specificTutor"/> Want help from a specific tutor</label>
+						</div>
+						<div class="form-group" data-ng-show="specificTutor">
+							<label for="stutor">Tutor:</label>
+							<select id="stutor" class="form-control" data-ng-model="inputRequest">
+								<option data-ng-repeat="tutor in tutors|filter:student.subject:true" value="{{tutor.name}}">{{tutor.name}}</option>
+							</select>
+						</div>
+					</form>
+				</div>
+				<div class="panel-footer">
+					<button type="button" class="btn btn-default" data-ng-click="sendRequest(inputStudent, inputRequest)"><span class="glyphicon glyphicon-ok-circle"></span> Send</button>
+				</div>
+			</div>
+			
+		</div>
+</div>

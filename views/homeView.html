@@ -1,0 +1,91 @@
+<div class="row">
+	<div class="col-xs-12">
+		<div class="row text-center">
+			<div class="col-xs-12">
+				<img class="logo-medium center-block" alt="logo" src="/img/logo.svg">
+				<h1 class="logo">HelpDesk++</h1> 
+				<p>Queue up, smart.</p>
+			</div>
+		</div>
+		<div class="row center-block">
+			<div class="col-xs-2 col-sm-3 col-md-4" ></div>
+			<div class="col-xs-8 col-sm-6 col-md-4">
+				<div class="row">
+					<div class="col panel panel-default">
+						<div class="panel-heading">Create a helpdesk</div>
+						<div class="panel-body">
+							<p>Create your own helpdesk and share the link for others to join</p>
+							<form role="form" name="createForm">
+								<div class="form-group">
+									<label for="inputName" class="sr-only">Helpdesk name</label>
+									<input id="inputName" class="form-control" name="helpdeskName" type="text" data-ng-model="helpdesk.name" placeholder="Helpdesk name" required="required" minlength="4" maxlength="10" pattern="^[a-zA-Z0-9]+$">
+								</div>
+								<div class="form-group" data-ng-show="createForm.helpdeskName.$touched">
+									<div class="col-xs-12" data-ng-show="createForm.helpdeskName.$error.required ">
+										<div class="alert alert-warning">
+											<strong><span class="glyphicon glyphicon-warning-sign"></span> Required!</strong> Please enter a name.
+										</div>
+									</div>
+									<div class="col-xs-12" data-ng-show="createForm.helpdeskName.$error.pattern">
+										<div class="alert alert-danger">
+											<strong><span class="glyphicon glyphicon-ban-circle"></span> Invalid!</strong> Only letters and numbers allowed in the name
+										</div>
+									</div>
+									<div class="col-xs-12" data-ng-show="createForm.helpdeskName.$error.minlength">
+										<div class="alert alert-danger">
+											<strong><span class="glyphicon glyphicon-ban-circle"></span> Invalid!</strong> Name must be 4 or more characters
+										</div>
+									</div>
+									<div class="col-xs-12" data-ng-show="createForm.helpdeskName.$error.maxlength">
+										<div class="alert alert-danger">
+											<strong><span class="glyphicon glyphicon-ban-circle"></span> Invalid!</strong> Name is too long
+										</div>
+									</div>
+								</div>
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" value="remember-me"  data-ng-model="helpdesk.online" data-ng-disabled="true"> Online mode
+										<a class="description" href="" data-toggle="popover" title="Session-only" data-placement="bottom" data-content="If enabled, people can join your helpdesk through the link">What is this?</a>
+									</label>
+								</div>
+								<button class="btn btn btn-primary btn-block" type="submit" data-ng-disabled="createForm.$invalid" data-ng-click="createHelpdesk(helpdesk)">Create Helpdesk</button>
+							</form>
+							
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col panel panel-default">
+						<div class="panel-heading">Join a helpdesk</div>
+						<div class="panel-body">
+							<p>Queue up in a pre-exisiting helpdesk by entering the join link</p>
+							<form role="form" name="joinForm">
+								<div class="form-group">
+									<label for="inputLink" class="sr-only">Helpdesk link</label>
+									<input id="inputLink" class="form-control" name="helpdeskLink" type="text" data-ng-model="helpdesk.link" placeholder="link" required="required" pattern="^[a-zA-Z0-9]+$" minlength="4" maxlength="10">
+								</div>
+								<div class="form-group" data-ng-show="joinForm.helpdeskLink.$touched">
+									<div class="col-xs-12" data-ng-show="joinForm.helpdeskLink.$error.required ">
+										<div class="alert alert-warning">
+											<strong><span class="glyphicon glyphicon-warning-sign"></span> Required!</strong> Please enter a link.
+										</div>
+									</div>
+									<div class="col-xs-12" data-ng-show="joinForm.helpdeskLink.$error.pattern || joinForm.helpdeskLink.$error.minlength">
+										<div class="alert alert-danger">
+											<strong><span class="glyphicon glyphicon-ban-circle"></span> Invalid!</strong> that's not a link
+										</div>
+									</div>
+								</div>
+								<div class="form-group well text-center" data-ng-show="joinForm.$valid">
+									<span class="strong">helpdesk.xfastgames.com/join/{{helpdesk.link}}</span>
+								</div>
+								<button class="btn btn btn-success btn-block" type="submit" data-ng-disabled="joinForm.$invalid">Join Helpdesk</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-1 col-sm-3 col-md-4"></div>
+		</div>
+	</div>
+</div>

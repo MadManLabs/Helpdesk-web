@@ -1,0 +1,410 @@
+<!-- Helpdesk view-->
+<div class="row">
+	<div class="col-xs-12 col-md-8">
+		<!-- Notification -->
+		<div class="row">
+			<div class="col-xs-12">
+				<div class=" alert alert-success" data-ng-show="false">
+					<p><span class="glyphicon glyphicon-ok-circle"></span> <strong>Queued!</strong> A tutor will attend you shortly</p>
+				</div>
+			</div>
+		</div>
+		<!-- Table -->
+		<div class="row">
+			<div class="col-xs-12">
+				<!-- Panel-->
+				<div class="panel panel-default" id="panelQueue">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-6 text-left">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-target="#Queue" href="">
+										<span class="badge">{{queue.length}}</span>
+										Queue
+									</a>
+								</h4>
+							</div>
+							<div class="col-xs-6 text-right">
+								<button type="button" class="btn btn-default  btn-xs" data-ng-click="refreshQueue()">
+									<span class="glyphicon glyphicon-refresh" data-placement="left" data-toggle="tooltip" title="Refresh" ></span>
+								</button>
+								<button type="button" class="btn btn-default  btn-xs" data-toggle="modal" data-target="#addStudent">
+									<span class="glyphicon glyphicon-plus" data-placement="left" data-toggle="tooltip" title="Add Student" ></span>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div id="Queue" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table table-hover">
+								<caption class="sr-only">
+									Queue of help
+								</caption>
+								<thead>
+									<td id="Student" class="col-xs-3 col-sm-3 col-md-3 text-left">Student</td>
+									<td id="Timer" class="col-xs-5 col-sm-6 col-md-6 text-center" data-ng-show="timerEnabled">Progress</td>
+									<td id="Description" class="col-xs-5 col-sm-6 col-md-6 text-center" data-ng-show="!timerEnabled">Want help on</td>
+									<td id="Options" class="col-xs-4 col-sm-3 col-md-3 text-right">Option</td>
+								</thead>
+								<tr data-ng-repeat="help in queue" style="border-left:5px {{unitToColor(help.student.subject)}} solid">
+									<td heading="Student">{{help.student.name}} <span class="label label-primary" style="background-color:{{unitToColor(help.tutor.subject)}};">{{help.tutor.name}}</span>
+										<span class="label label-default" data-ng-show="help.request!=0 && !help.tutor" style="border:1px {{unitToColor(help.student.subject)}} solid; color: {{unitToColor(help.student.subject)}}; background-color:rgba(255, 255, 255, 0);">{{help.request}}</span>
+									</td>
+									<td heading="Description">
+										<div class="progress" data-ng-show="timerEnabled">
+											<div class="progress-bar progress-bar-striped active" data-ng-show="timerEnabled" role="progressbar"
+											aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:{{help.progress}}%">
+												<span class="sr-only">{{help.progress}}% Complete</span>
+											</div>
+										</div>
+										<div class="text-center" data-ng-show="!timerEnabled">
+											<span class="badge" style="background-color:{{unitToColor(help.student.subject)}}" >{{help.student.subject}}</span>
+											{{help.description}}
+										</div>
+									</td>
+									<td heading="Options" class="text-right">
+										<div data-ng-show="!locked">
+											<button type="button" class="btn btn-link btn-xs" data-ng-class="lockedStyle" data-ng-click="ShiftUp(help)" data-placement="bottom" data-toggle="tooltip" title="Queue Up">
+												<span class="glyphicon glyphicon-chevron-up"></span>
+											</button>
+											<button type="button" class="btn btn-link btn-xs " data-ng-class="lockedStyle" data-ng-click="ShiftDown(help)" data-placement="bottom" data-toggle="tooltip" title="Queue Down">
+												<span class="glyphicon glyphicon-chevron-down"></span>
+											</button>
+											<button type="button" class="btn btn-warning btn-xs " data-ng-class="lockedStyle" data-ng-click="Requeue(help)" data-placement="bottom" data-toggle="tooltip" title="Requeue">
+												<span class="glyphicon glyphicon-repeat"></span>
+											</button>
+											<button type="button" class="btn btn-danger btn-xs " data-ng-class="lockedStyle" data-ng-click="Dequeue(help)" data-placement="bottom" data-toggle="tooltip" title="Delete">
+												<span class="glyphicon glyphicon-remove"></span>
+											</button>
+										</div>
+										<div data-ng-show="locked">
+											<a href="javascript:alert('Unlock in settings to make changes')"><span class="glyphicon glyphicon-lock"></span></a>
+										</div>
+									</td>
+								</tr>
+								<tr class="active" data-ng-show="!queue.length"><td class="text-center"colspan="3">Add Students using + button or QuickAdd</td></tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!--Quick Add-->
+		<div class="row">
+			<div class="col-xs-12">
+				<!-- Panel-->
+				<div class="panel panel-default" id="panelQuickAdd">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-6 text-left">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-target="#QuickAdd" href="">
+										Quick add
+									</a>
+								</h4>
+							</div>
+						</div>
+					</div>
+					<div id="QuickAdd" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<form class="form-inline" role="form" validate="validate">
+								<div class="row">
+									<div class="col-xs-10 text-left">
+										<div class="form-group">
+											<label class="sr-only" for="sname">Name:</label>
+											<input id="sname" class="form-control" name="sname" type="text" data-ng-model="inputStudent.name" placeholder="Name">
+										</div>
+										<div class="form-group">
+											<label class="sr-only" for="sunit">Unit:</label>
+											<select id="sunit" class="form-control" data-ng-model="inputStudent.subject">
+												<option value="" disabled selected>Select your unit</option>
+												<option data-ng-repeat="unit in units" value="{{unit.name}}">{{unit.name}}</option>
+											</select>
+										</div>
+										<div class="form-group">
+											<label class="sr-only" for="sdescription">Description:</label>
+											<textarea id="sdescription" class="form-control" name="sdescription" type="text" data-ng-model="inputDescription" rows="1" placeholder="Need help on?"></textarea>
+										</div>
+										<div class="form-group">
+											<label for="stutor">From: </label>
+											<select id="stutor" class="form-control" data-ng-model="inputRequest">
+												<option value="" selected>Any Tutor</option>
+												<option data-ng-repeat="tutor in tutors|filter:inputStudent.subject:true" value="{{tutor.name}}">{{tutor.name}}</option>
+											</select>
+										</div>
+									</div>
+									<div class="col-xs-2 text-right">
+										<button type="reset" class="btn btn-default" data-ng-click="AddStudentToQueue(inputStudent,inputDescription,inputRequest); inputStudent=0; inputDescription='';"><span class="glyphicon glyphicon-plus"></span> Add</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--Sidebar-->
+	<div class="col-xs-12 col-md-4">
+		<div class="row">
+			<!--Information-->
+			<div class="col-xs-12 col-sm-6 col-md-12 panel-group">
+				<div class="panel panel-default" id="panelInformation">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-6 text-left ">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-target="#information" href="">
+										<span class="badge">{{name}}</span> Information
+									</a>
+								</h4>
+							</div>
+							<div class="col-xs-6 text-right">
+									<button type="button" class="btn btn-default btn-xs " data-toggle="modal" data-target="#EditInformation">
+										<span class="glyphicon  glyphicon-pencil" data-toggle="tooltip" data-placement="left" title="Edit"></span>
+									</button>
+							</div>
+						</div>
+					</div>
+					<div id="information" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<p>{{message}}</p>
+						</div>
+						<div class="panel-body" data-ng-show="QREnabled">
+							<p class="text-center">To join the queue, Follow this link or scan the QR code, and enter your details</p>
+							<div class="form-group well text-center">
+									<h4>helpdesk.xfastgames.com/join/{{name}}</h4>
+								</div>
+							<img class="img-responsive center-block" src=" https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://helpdesk.xfastgames.com/#/join/{{name}}"/>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--Tutor list-->
+			<div class="col-xs-12 col-sm-6  col-md-12 panel-group">
+				<div class="panel panel-default" id="panelTutors">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-6 text-left">
+								<h4 class="panel-title">
+									<a data-toggle="collapse" data-target="#tutorList" href="">
+										<span class="badge">{{tutors.length}}</span> Tutors on duty
+									</a>
+								</h4>
+							</div>
+							<div class="col-xs-6 text-right">
+									<button type="button" class="btn btn-default btn-xs " data-ng-click="" data-toggle="modal" data-target="#addTutor">
+										<span class="glyphicon glyphicon-plus" data-toggle="tooltip" data-placement="left" title="Add Tutor"></span>
+									</button>
+							</div>
+						</div>
+					</div>
+					<div id="tutorList" class="panel-collapse collapse in">
+						<div class="panel-body">
+							<table class="table table-hover">
+								<thead>
+									<td class="col-xs-4 text-left">Name</td>
+									<td class="col-xs-4 text-center">Subject</td>
+									<td class="col-xs-4 text-right">Options</td>
+								</thead>
+								<tr data-ng-repeat="tutor in tutors">
+									<td class="text-left">{{tutor.name}}</td>
+									<td class="text-center"><span class="label label-primary" style="background-color:{{unitToColor(tutor.subject)}}" >{{tutor.subject}}</span></td>
+									<td class="text-right">
+										<button type="button" class="btn btn-link btn-xs " data-ng-click="ShiftTutor(tutor)" data-placement="bottom" data-toggle="tooltip" title="Attend next">
+											<span class="glyphicon glyphicon-forward"></span> 
+										</button>
+										<button type="button" class="btn btn-link btn-xs " data-ng-click="ResignTutor(tutor)" data-placement="bottom" data-toggle="tooltip" title="Sign off">
+											<span class="glyphicon glyphicon-log-out"></span> 
+										</button>
+									</td>
+								</tr>
+								<tr class="active" data-ng-show="!tutors.length"><td class="text-center"colspan="3">Add Tutors using + button</td></tr>
+							</table>
+						</div>
+						<div class="panel-footer">
+							<button type="button" class="btn btn-default btn-sm" data-ng-click="" data-toggle="modal" data-target="#addTutor">
+								<span class="glyphicon glyphicon-plus"></span> Add Tutor
+							</button>
+							<button type="button" class="btn btn-default btn-sm" data-ng-click="" data-toggle="modal" data-target="#addUnit">
+								<span class="glyphicon glyphicon-plus"></span> Add Unit
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Add Student view -->
+	<div id="addStudent" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Add Student</h4>
+				</div>
+				<div class="modal-body">
+					<p>Enter details of the student</p>
+					<form class="form" name="studentEntry">
+						<div class="form-group">
+							<label for="sname">Name:</label>
+							<input id="sname" class="form-control" name="sname" type="text" data-ng-model="inputStudent.name" required="required">
+						</div>
+						<div class="form-group">
+							<label for="sunit">Unit:</label>
+							<select id="sunit" class="form-control" data-ng-model="inputStudent.subject">
+								<option data-ng-repeat="unit in units" value="{{unit.name}}">{{unit.name}}</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label for="sdescription">Need help on?</label>
+							<textarea id="sdescription" class="form-control" name="sdescription" type="text" data-ng-model="inputDescription">(eg: task no.)</textarea>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" data-ng-model="specificTutor"/> Want help from a specific tutor</label>
+						</div>
+						<div class="form-group" data-ng-show="specificTutor">
+							<label for="stutor">Tutor:</label>
+							<select id="stutor" class="form-control" data-ng-model="inputRequest">
+								<option data-ng-repeat="tutor in tutors|filter:student.subject:true" value="{{tutor.name}}">{{tutor.name}}</option>
+							</select>
+						</div>
+					</form>
+					<p>Requesting a specific tutor might take longer</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-ng-click="AddStudentToQueue(inputStudent,inputDescription,inputRequest)" data-dismiss="modal"><span class="glyphicon glyphicon-ok-circle"></span> Add</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Add Tutor view -->
+	<div id="addTutor" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Add Tutor</h4>
+				</div>
+				<div class="modal-body">
+					<p>Enter details of the tutor</p>
+					<form class="form" name="studentEntry">
+						<div class="form-group">
+							<label for="tname">Name:</label>
+							<input id="tname" class="form-control" name="tname" type="text" data-ng-model="tutor.name" required="required">
+						</div>
+						<div class="form-group">
+							<label for="tunit">Unit:</label>
+							<select id="tunit" class="form-control" data-ng-model="tutor.subject">
+								<option data-ng-repeat="unit in units" value="{{unit.name}}">{{unit.name}}</option>
+							</select>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-ng-click="AddTutor(tutor)" data-dismiss="modal"><span class="glyphicon glyphicon-ok-circle"></span> Add</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Add Unit view -->
+	<div id="addUnit" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Add Unit</h4>
+				</div>
+				<div class="modal-body">
+					<p>Enter details of the Unit</p>
+					<form class="form" name="studentEntry">
+						<div class="form-group">
+							<label for="uname">Unit Name:</label>
+							<input id="uname" class="form-control" name="uname" type="text" data-ng-model="unit.name" required="required">
+						</div>
+						<div class="form-group">
+							<label for="ucolor">Color:</label>
+							<input id="ucolor" class="form-control" name="ucolor" type="color" data-ng-model="unit.color" required="required">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-ng-click="AddUnit(unit)" data-dismiss="modal"><span class="glyphicon glyphicon-ok-circle"></span> Add</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Edit Information view -->
+	<div id="EditInformation" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Edit Information</h4>
+				</div>
+				<div class="modal-body">
+					<p>Edit the information you want to display</p>
+					<form class="form" name="studentEntry">
+						<div class="form-group">
+							<label for="iMessage">Message:</label>
+							<textarea class="form-control" name="iMessage" rows="4" cols="30" data-ng-model="message" >
+							</textarea>
+						</div>
+						<div class="form-group">
+							<label for="iQR">Display Join QR:</label>
+							<input id="iQR" type="checkbox" checked="checked" data-ng-model="QREnabled">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Application settings-->
+	<div id="HelpdeskOption" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Settings</h4>
+				</div>
+				<div class="modal-body">
+					<p>Edit options for the current helpdesk</p>
+					<form class="form" name="studentEntry">
+						<div class="form-group">
+							<label>
+								<input type="checkbox" data-ng-model="timerEnabled"> 
+								Enable Timer Mode (Experimental)
+								<a class="description" href="" data-toggle="popover" title="Timer Mode" data-placement="bottom" data-content="Once enabled, all the help requests will have a limited time, and once expired they will automatically requeued">What is this?</a>
+							</label>
+							<div class="row "data-ng-show="timerEnabled">
+								<div class="col-xs-8 form-group">
+									<label class="sr-only" for="htimer">Ticket expires: </label>
+									<input id="htime" class="form-control" name="htime" type="number" data-ng-model="help.time" placeholder="Expiration Time"/>
+								</div>
+								<div class="col-xs-4">
+									<button type="button" class="btn btn-primary" data-ng-click="resetAllTimes()"><span class="glyphicon glyphicon-time"></span> Reset times</button>
+									<!--<input type="checkbox" checked data-toggle="toggle" data-on="&lt;i class='glyphicon glyphicon-volume-up'&gt;&lt;/i&gt; Sounds" data-onstyle="info" data-width="100" data-off="&lt;i class='glyphicon glyphicon-volume-off'&gt;&lt;/i&gt; Muted">-->
+								</div>
+							</div>
+						</div>
+						<div class="form-group">
+							<button type="button" class="btn btn-warning" data-ng-click="Lock()"><span class="glyphicon glyphicon-lock"></span> {{(locked)?"Unlock":"Lock"}}</button>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-ok-circle"> Save</span></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
