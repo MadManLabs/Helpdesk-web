@@ -1,4 +1,4 @@
-![alt tag](https://github.com/xxfast/Helpdesk-qms/blob/master/img/logo.svg)
+![alt tag](https://github.com/xxfast/Helpdesk-qms/img/logo.png)
 
 # Helpdesk-qms
 
