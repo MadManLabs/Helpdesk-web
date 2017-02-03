@@ -4,7 +4,7 @@ A Utility that helps you to manage your helpdesk with smart queuing system
 
 ## Description:
 
-	Tired of waiting in the programming Helpdesk hoping someone would eventually help you out? Wait no more! Helpdesk++ is a Helpdesk ticketing system that enable students to queue up in the helpdesk online through their own web browser.
+Tired of waiting in the programming Helpdesk hoping someone would eventually help you out? Wait no more! Helpdesk++ is a Helpdesk ticketing system that enable students to queue up in the helpdesk online through their own web browser.
 
 ## Typical Usecase:
 
