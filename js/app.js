@@ -340,71 +340,17 @@ app.controller('homeViewController',
 
 // Services
 app.service('Database', function($http) {
-	//Sale APIS
-	this.getSales = function () {
-		return $http.get("api/salesapi.php/sales");
+	//Requests APIs
+	this.getJoinRequests = function (id) {
+		return $http.get("api/connection.php/requests?helpdesk="+id);
 	};
 
-	this.getSalesFrom = function (startDate,endDate) {
-		return $http.get("api/salesapi.php/month_sales/date?start="+startDate+"&end="+endDate);
-	};
-
-	this.getSale = function (id) {
-			return $http.get("api/salesapi.php/sales/"+id);
-	};
-	this.addSale = function (toAdd) {
-			return $http.post("api/salesapi.php/sales/", toAdd, {headers: {'Content-Type': 'application/json'} });
-	};
-
-	//Inventory APIS
-	this.getInventory= function () {
-			return $http.get("api/product_api.php/product/");
-	};
-	this.getItem = function (item_id) {
-			return $http.get("api/product_api.php/product/"+item_id);
-	};
-	this.getProduct = function (batch_id) {
-			return $http.get("api/product_api.php/batch/"+batch_id);
-	};
-			//Batch APIS
-			this.getBatches = function (prouct_id) {
-					return $http.get("api/batch_api.php/product/"+prouct_id);
-			};
-			this.updateBatch = function (id, dataToUpdate) {
-					return $http.put("api/batch_api.php/batch/"+id,dataToUpdate,{headers: {'Content-Type': 'application/json'} });
-			};
-			this.addBatch = function (toAdd) {
-					return $http.post("api/batch_api.php/batch/",toAdd,{headers: {'Content-Type': 'application/json'} });
-			};
-
-	this.updateItem = function (id, dataToUpdate) {
-			return $http.put("api/product_api.php/product/"+id,dataToUpdate,{headers: {'Content-Type': 'application/json'} });
-	};
-	this.addItem = function (toAdd) {
-			return $http.post("api/product_api.php/product/",toAdd,{headers: {'Content-Type': 'application/json'} });
-	};
-
-	//Drug APIS
-	this.getDrugs = function () {
-			return $http.get("api/drug_api.php/type/");
-	};
-
-	//Report APIS
-	this.getReportSales = function (month,year) {
-			return $http.get("api/report_api.php/sales/sale?month="+month+"&year="+year);
-	};
-
-	this.getReportItems = function (month, year) {
-			var date = new Date(year, month, 0, 12, 0, 0, 0);
-			var start = new Date(date.moveToFirstDayOfMonth().getTime());
-			var end = new Date(date.moveToLastDayOfMonth().getTime());
-			start = start.toISOString().slice(0,10);
-			end = end.toISOString().slice(0,10);
-			return $http.get("api/report_api.php/sales/items?start="+start+"&end="+end);
+	//Helpdesk APIs
+	this.registerHelpdesk = function (toRegister) {
+			return $http.post("api/salesapi.php/sales/", toRegister, {headers: {'Content-Type': 'application/json'} });
 	};
 
 	// Authentication API
-
 	this.doLogin = function (toAdd) {
 		return $http({
 			method: 'POST',
@@ -450,9 +396,5 @@ app.service('Database', function($http) {
 		});
 	};
 
-	//Prediction APIS
-	this.getPredictItems = function (month,year) {
-			return $http.get("api/prediction_api.php/sales/sale?month="+month+"&year="+year);
-	};
 
 });
