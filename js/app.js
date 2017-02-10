@@ -25,7 +25,7 @@ app.run(
 });
 
 // Data factory
-app.factory("Data", 
+app.factory("Data",
 	function () {
 		var storage = {
 			model: {
@@ -100,15 +100,15 @@ app.controller ("helpdeskController",
 	{
 		Data.store().restore();
 		$scope.name = $routeParams.name;
-		$scope.units = Data.units(); 
-		$scope.tutors = Data.tutors(); 
+		$scope.units = Data.units();
+		$scope.tutors = Data.tutors();
 		$scope.queue = Data.queue();
 		$scope.message = "Welcome to the Programming Helpdesk!";
 		$scope.QREnabled = false;
 		$scope.timerEnabled = false;
 		$scope.locked = false;
 		$scope.lockedStyle = "active";
-	
+
 		$scope.Lock = function ()
 		{
 			$scope.locked = !$scope.locked;
@@ -116,21 +116,21 @@ app.controller ("helpdeskController",
 		}
 		$scope.Requeue = function(help)
 		{
-			
+
 			$scope.queue.splice($scope.queue.indexOf(help),1);
 			help.progress = 0;
 			if(help.tutor) help.tutor = $scope.ReassignTutor(help.tutor);
 			$scope.queue.push(help);
 			Data.store().save();
 		}
-		
+
 		$scope.Dequeue = function(help)
 		{
 			if(help.tutor) $scope.ReassignTutor(help.tutor);
 			$scope.queue.splice($scope.queue.indexOf(help),1);
 			Data.store().save();
 		}
-		
+
 		$scope.ShiftUp = function(help)
 		{
 			var DownIndex = $scope.queue.indexOf(help);
@@ -140,7 +140,7 @@ app.controller ("helpdeskController",
 			$scope.queue[UpIndex] = help;
 			Data.store().save();
 		}
-		
+
 		$scope.ShiftDown = function(help)
 		{
 			var UpIndex = $scope.queue.indexOf(help);
@@ -150,7 +150,7 @@ app.controller ("helpdeskController",
 			$scope.queue[DownIndex] = help;
 			Data.store().save();
 		}
-		
+
 		$scope.unitToColor = function (unitName)
 		{
 			for(unit in $scope.units)
@@ -162,7 +162,7 @@ app.controller ("helpdeskController",
 			}
 			return "black";
 		}
-		
+
 		$scope.AddStudentToQueue = function(inputStudent,inputDescription,inputRequest)
 		{
 			if(inputStudent.name)
@@ -176,21 +176,21 @@ app.controller ("helpdeskController",
 				Data.store().save();
 			}
 		}
-		
+
 		$scope.AddTutor = function(tutor)
 		{
 			var input = {name:tutor.name,subject:tutor.subject};
 			if(tutor) $scope.tutors.push(input);
 			Data.store().save();
 		}
-		
+
 		$scope.AddUnit = function(unit)
 		{
 			var input = {name:unit.name,color:unit.color};
 			if(unit) $scope.units.push(input);
 			Data.store().save();
 		}
-		
+
 		$scope.ResignTutor = function(t)
 		{
 			$scope.tutors.splice($scope.tutors.indexOf(t),1);
@@ -208,7 +208,7 @@ app.controller ("helpdeskController",
 			}
 			Data.store().save();
 		}
-		
+
 		$scope.ShiftTutor = function (t)
 		{
 			for(spot in $scope.queue)
@@ -245,7 +245,7 @@ app.controller ("helpdeskController",
 				}
 			}
 		}
-		
+
 		$scope.ReassignTutor = function(t)
 		{
 			for(spot in $scope.queue)
@@ -276,7 +276,7 @@ app.controller ("helpdeskController",
 			return t;
 			Data.store().save();
 		}
-		
+
 		$scope.resetAllTimes = function()
 		{
 			if($scope.timerEnabled)
@@ -284,11 +284,11 @@ app.controller ("helpdeskController",
 				for(help in $scope.queue)
 				{
 					$scope.queue[help].progress=0;
-				}	
+				}
 			}
 			Data.store().save();
 		}
-		
+
 		$scope.updateProgress = function()
 		{
 			if($scope.timerEnabled)
@@ -304,26 +304,26 @@ app.controller ("helpdeskController",
 							Data.store().save();
 						}
 					}
-				}	
+				}
 			}
 		}
-		
+
 		$scope.refreshQueue = function()
 		{
-			
+
 		}
-		
+
 		//Timer
 		$interval($scope.updateProgress, 1000);
 	}
 );
 
-app.controller('joinController', 
+app.controller('joinController',
 	function($scope, $routeParams){
 		$scope.helpdesk = ($routeParams.helpdesk)?$routeParams.helpdesk:"helpdesk";
 		$scope.sendRequest = function(student,request)
 		{
-			
+
 		}
 });
 
@@ -339,59 +339,120 @@ app.controller('homeViewController',
 });
 
 // Services
-app.service('Database', function() {
-	this.getRequests = function (helpdesk_id) {
-		var url = "process.php/requests/helpdesk/"+helpdesk_id;
-		$http.get(url)
-			.then (function(response) {
-					return response.data;
-				}
-				,function(response) {
-					return {error:response.status,desc:response.statusText}
+app.service('Database', function($http) {
+	//Sale APIS
+	this.getSales = function () {
+		return $http.get("api/salesapi.php/sales");
+	};
+
+	this.getSalesFrom = function (startDate,endDate) {
+		return $http.get("api/salesapi.php/month_sales/date?start="+startDate+"&end="+endDate);
+	};
+
+	this.getSale = function (id) {
+			return $http.get("api/salesapi.php/sales/"+id);
+	};
+	this.addSale = function (toAdd) {
+			return $http.post("api/salesapi.php/sales/", toAdd, {headers: {'Content-Type': 'application/json'} });
+	};
+
+	//Inventory APIS
+	this.getInventory= function () {
+			return $http.get("api/product_api.php/product/");
+	};
+	this.getItem = function (item_id) {
+			return $http.get("api/product_api.php/product/"+item_id);
+	};
+	this.getProduct = function (batch_id) {
+			return $http.get("api/product_api.php/batch/"+batch_id);
+	};
+			//Batch APIS
+			this.getBatches = function (prouct_id) {
+					return $http.get("api/batch_api.php/product/"+prouct_id);
+			};
+			this.updateBatch = function (id, dataToUpdate) {
+					return $http.put("api/batch_api.php/batch/"+id,dataToUpdate,{headers: {'Content-Type': 'application/json'} });
+			};
+			this.addBatch = function (toAdd) {
+					return $http.post("api/batch_api.php/batch/",toAdd,{headers: {'Content-Type': 'application/json'} });
+			};
+
+	this.updateItem = function (id, dataToUpdate) {
+			return $http.put("api/product_api.php/product/"+id,dataToUpdate,{headers: {'Content-Type': 'application/json'} });
+	};
+	this.addItem = function (toAdd) {
+			return $http.post("api/product_api.php/product/",toAdd,{headers: {'Content-Type': 'application/json'} });
+	};
+
+	//Drug APIS
+	this.getDrugs = function () {
+			return $http.get("api/drug_api.php/type/");
+	};
+
+	//Report APIS
+	this.getReportSales = function (month,year) {
+			return $http.get("api/report_api.php/sales/sale?month="+month+"&year="+year);
+	};
+
+	this.getReportItems = function (month, year) {
+			var date = new Date(year, month, 0, 12, 0, 0, 0);
+			var start = new Date(date.moveToFirstDayOfMonth().getTime());
+			var end = new Date(date.moveToLastDayOfMonth().getTime());
+			start = start.toISOString().slice(0,10);
+			end = end.toISOString().slice(0,10);
+			return $http.get("api/report_api.php/sales/items?start="+start+"&end="+end);
+	};
+
+	// Authentication API
+
+	this.doLogin = function (toAdd) {
+		return $http({
+			method: 'POST',
+			url:'api/loginapi.php',
+			data: $.param({username: toAdd.username,password:toAdd.password}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		});
+	};
+	this.doLogout = function(){
+		return $http({
+			method: 'POST',
+			url:'api/logout.php'
 		});
 	}
-	
-	this.getUnits = function (helpdesk_id) {
-		var url = "process.php/units/helpdesk/"+helpdesk_id;
-		$http.get(url)
-			.then (function(response) {
-					return response.data;
-				}
-				, function(response) {
-					return {error:response.status,desc:response.statusText}
-			});
-	}
-	
-	this.getTutors = function (helpdesk_id) {
-		var url = "process.php/tutors/helpdesk/"+helpdesk_id;
-		$http.get(url)
-			.then (function(response) {
-					return response.data;
-				}
-				, function(response) {
-					return {error:response.status,desc:response.statusText}
-			});
-	}
-	
-	$scope.makeRequest = function(rname, runit, rdesc, rrequest) {
-			var url = "process.php/request/helpdesk/"+helpdesk_id;
-			var data = JSON.stringify ({name: rname, unit: runit, desc:rdesc,request:rrequest});
-			$http.put(url, data)
-				.then(function (response) {
-				}, function (response) {
-					return {error:response.status,desc:response.statusText}
-				});
-			};
-	
-	$scope.deleteRequest = function(request_id) {
-			var url = "process.php/request/request_id/"+request_id;
-			$http.delete(url)
-				.then(function (response) {
-					//do nothing
-				}, function (response) {
-					return {error:response.status,desc:response.statusText}
-				});
-			};
+	this.getUsers = function () {
+		return $http.get("api/getusers_api.php");
+	};
+	this.createUser = function (toAdd) {
+		//console.log(toAdd);
+		return $http({
+			method: 'POST',
+			url:'api/adduser_api.php',
+			data: $.param({staffname:toAdd.staffname,role:toAdd.role,username: toAdd.username,password:toAdd.password}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		});
+	};
+	this.resetPassword = function (toAdd) {
+		//console.log(toAdd);
+		return $http({
+			method: 'POST',
+			url:'api/password_api.php',
+			data: $.param({id:toAdd.id,password:toAdd.password}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		});
+	};
+	this.deleteUser = function (toAdd) {
+		//console.log(toAdd);
+		return $http({
+			method: 'POST',
+			url:'api/deluser_api.php',
+			data: $.param({id:toAdd.id}),
+			headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+		});
+	};
+
+	//Prediction APIS
+	this.getPredictItems = function (month,year) {
+			return $http.get("api/prediction_api.php/sales/sale?month="+month+"&year="+year);
+	};
+
 });
-
-
