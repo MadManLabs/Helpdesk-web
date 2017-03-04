@@ -1,8 +1,8 @@
 ![alt tag](https://github.com/xxfast/Helpdesk-qms/blob/master/img/logo.png)
 
-# Helpdesk-qms
+# Helpdesk-web
 
-A Utility that helps you to manage your helpdesk with smart queuing system
+A Web utility that helps you to manage your helpdesk with smart queuing system
 
 ## Description:
 
